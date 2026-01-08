@@ -18,6 +18,41 @@ def draw_landmarks_on_image(image_bgr, detection_result):
 
     return annotated_image
 
+def detect_emotion(blendshapes):
+    """
+    Deduce l'emozione basandosi sui coefficienti blendshapes di MediaPipe.
+    Restituisce una stringa con l'emozione rilevata.
+    """
+    scores = {b.category_name: b.score for b in blendshapes}
+
+    # Soglie e logica euristica semplice
+
+    # Felicità: angoli della bocca in su
+    if scores.get('mouthSmileLeft', 0) > 0.4 and scores.get('mouthSmileRight', 0) > 0.4:
+        return "FELICE"
+
+    # Rabbia: sopracciglia abbassate e contratte
+    if scores.get('browDownLeft', 0) > 0.4 and scores.get('browDownRight', 0) > 0.4:
+        return "ARRABBIATO"
+
+    # Sorpresa: sopracciglia alzate e/o bocca aperta
+    if scores.get('browInnerUp', 0) > 0.5 and scores.get('jawOpen', 0) > 0.1:
+        return "SORPRESO"
+
+    # Paura: occhi spalancati
+    if scores.get('eyeWideLeft', 0) > 0.5 and scores.get('eyeWideRight', 0) > 0.5:
+        return "SPAVENTATO"
+
+    # Tristezza: angoli della bocca in giù e sopracciglia interne alzate
+    if scores.get('mouthFrownLeft', 0) > 0.4 and scores.get('mouthFrownRight', 0) > 0.4:
+        return "TRISTE"
+
+    # Occhi chiusi (extra)
+    if scores.get('eyeBlinkLeft', 0) > 0.6 and scores.get('eyeBlinkRight', 0) > 0.6:
+        return "DORMIENTE"
+
+    return "NEUTRO"
+
 def draw_blendshapes_on_image(image_bgr, detection_result):
     face_blendshapes_list = detection_result.face_blendshapes
     annotated_image = np.copy(image_bgr)
@@ -28,11 +63,16 @@ def draw_blendshapes_on_image(image_bgr, detection_result):
     # Prendiamo il primo volto
     blendshapes = face_blendshapes_list[0]
 
+    # Rilevamento e visualizzazione Emozione
+    emotion = detect_emotion(blendshapes)
+    cv2.putText(annotated_image, f"EMOZIONE: {emotion}", (50, 80),
+                cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 0, 255), 3)
+
     # Ordiniamo le espressioni per punteggio decrescente
     sorted_blendshapes = sorted(blendshapes, key=lambda x: x.score, reverse=True)
 
     # Mostriamo le prime 5
-    y_pos = 30
+    y_pos = 130
     for category in sorted_blendshapes[:5]:
         text = f"{category.category_name}: {category.score:.2f}"
         cv2.putText(annotated_image, text, (10, y_pos),
