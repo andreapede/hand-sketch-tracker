@@ -1,0 +1,11 @@
+name: hand-sketch-tracker
+channels:
+  - defaults
+dependencies:
+  - python=3.13
+  - pip
+  - pip:
+      - mediapipe
+      - opencv-python
+      - numpy
+

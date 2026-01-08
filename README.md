@@ -24,7 +24,13 @@ Il progetto include quattro moduli principali:
     cd hand-sketch-tracker
     ```
 
-2.  Installa le dipendenze necessarie:
+2.  Crea l'ambiente Conda e installa le dipendenze:
+    ```bash
+    conda env create -f environment.yml
+    conda activate hand-sketch-tracker
+    ```
+    
+    *Oppure, se preferisci usare pip manualmente:*
     ```bash
     pip install opencv-python mediapipe numpy
     ```
@@ -62,4 +68,3 @@ python hand_silhouette.py
 
 *   Per uscire da qualsiasi programma, assicurati che la finestra sia attiva e premi il tasto **ESC**.
 *   La prima esecuzione potrebbe richiedere qualche secondo per inizializzare i modelli di MediaPipe.
-
